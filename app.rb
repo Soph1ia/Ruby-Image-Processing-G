@@ -1,6 +1,7 @@
 require "functions_framework"
 require "json"
 require "chunky_png"
+require "benchmark"
 
 # This function receives an HTTP request of type Rack::Request
 # and interprets the body as JSON. It prints the contents of
@@ -8,17 +9,31 @@ require "chunky_png"
 FunctionsFramework.http "hello_world" do |request|
   input = JSON.parse request.body.read rescue {}
   msg = input["message"].to_s
-  image_resizer = Rotate_Image.new
-  image_resizer.rotate
-  output = "Resized image successfully"
+  util = Image_Benchmarking.new
+  output = util.run
   return output.to_s
+end
+
+class Image_Benchmarking
+
+  def run
+    puts Benchmark.measure {
+      50.times do
+        image = Rotate_Image.new
+        image.resize
+      end
+    }
+    return " Image resized 50 times successfully"
+
+  end
+
 end
 
 class Rotate_Image
 
-  def rotate
+  def resize
     image = ChunkyPNG::Image.from_file('image.png')
-    resized_image = image.resize(1024,1000)
+    resized_image = image.resize(1024, 1000)
     return resized_image
   end
 end
