@@ -16,7 +16,8 @@ class Image_Benchmarking
 
   def run
     puts Benchmark.measure {
-      50.times do
+      # 50.times do
+      1.times do
         image = Image_Handler.new
         image.resize
       end
